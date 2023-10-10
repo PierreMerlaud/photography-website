@@ -1,16 +1,34 @@
 // import React from "react";
 "use client";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const UploadForm = () => {
   const formRef = useRef();
-  const [files, setfiles] = useState([]);
+  const [files, setFiles] = useState([]);
+
+  async function handleInputFiles(e) {
+    const files = e.target.files;
+
+    const newFiles = [...files].filter((file) => {
+      if (file.size < 1024 * 1024 && file.type.startsWith("image/")) {
+        //only accept image files less than 1mb in size.
+        return file;
+      }
+    });
+
+    setFiles((prev) => [...newFiles, ...prev]);
+  }
 
   return (
     //formRef will point to this specific <form>
     <form action="" ref={formRef}>
       <div>
-        <input type="file" accept="image/*" multiple />
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleInputFiles}
+        />
         <h5>
           (*) Only accept image files less than 1mb in size. Up to 3 photo
           files.
