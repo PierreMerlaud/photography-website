@@ -1,6 +1,7 @@
 // import React from "react";
 "use client";
 import { useRef, useState } from "react";
+import PhotoCard from "./PhotoCard";
 
 const UploadForm = () => {
   const formRef = useRef();
@@ -19,6 +20,11 @@ const UploadForm = () => {
     setFiles((prev) => [...newFiles, ...prev]);
   }
 
+  async function handleDeleteFile(index) {
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+  }
+
   return (
     //formRef will point to this specific <form>
     <form action="" ref={formRef}>
@@ -33,6 +39,17 @@ const UploadForm = () => {
           (*) Only accept image files less than 1mb in size. Up to 3 photo
           files.
         </h5>
+
+        {/* Preview images */}
+        <div>
+          {files.map((file, index) => (
+            <PhotoCard
+              key={index}
+              url={URL.createObjectURL(file)}
+              onClick={() => handleDeleteFile(index)}
+            />
+          ))}
+        </div>
       </div>
     </form>
   );
