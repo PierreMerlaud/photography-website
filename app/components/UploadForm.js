@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import PhotoCard from "./PhotoCard";
 import ButtonSubmit from "./ButtonSubmit";
+import { uploadPhoto } from "@/actions/uploadActions";
 
 const UploadForm = () => {
   const formRef = useRef();
@@ -27,6 +28,24 @@ const UploadForm = () => {
   async function handleDeleteFile(index) {
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
+  }
+
+  //handles the preparation of form data for uploading selected image files.
+  async function handleUpload() {
+    if (!files.length) return alert("No image files are selected.");
+    if (!files.length > 3) return alert("Upload up to 3 image files.");
+
+    /*FormData is a built-in JavaScript object that allows you to construct a set of key/value pairs representing 
+    form fields and their values, which can be easily sent as the body of a POST request. */
+    const formData = new FormData();
+
+    /*This loop iterates over each file in the files array and appends it to the formData object using the append method. 
+    The key "files" and the file itself are paired in the formData object. */
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    const res = await uploadPhoto(formData);
   }
 
   return (
