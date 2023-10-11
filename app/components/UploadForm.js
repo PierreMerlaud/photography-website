@@ -2,6 +2,7 @@
 "use client";
 import { useRef, useState } from "react";
 import PhotoCard from "./PhotoCard";
+import ButtonSubmit from "./ButtonSubmit";
 
 const UploadForm = () => {
   const formRef = useRef();
@@ -30,7 +31,7 @@ const UploadForm = () => {
 
   return (
     //formRef will point to this specific <form>
-    <form action="" ref={formRef}>
+    <form action={handleUpload} ref={formRef}>
       <div>
         <input
           type="file"
@@ -54,6 +55,8 @@ const UploadForm = () => {
           ))}
         </div>
       </div>
+
+      <ButtonSubmit value="Upload to Cloudinary" />
     </form>
   );
 };
