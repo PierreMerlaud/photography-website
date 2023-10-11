@@ -18,8 +18,11 @@ const UploadForm = () => {
     });
 
     setFiles((prev) => [...newFiles, ...prev]);
+    //reset a form element to its initial state, to prepare it for a new set of inputs after a user submit.
+    formRef.current.reset();
   }
 
+  //iterate in files array and push in the newFiles array only indexes not equal to the selected file.
   async function handleDeleteFile(index) {
     const newFiles = files.filter((_, i) => i !== index);
     setFiles(newFiles);
