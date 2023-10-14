@@ -5,6 +5,14 @@ import path from "path";
 import fs from "fs/promises";
 import { v4 as uuidv4 } from "uuid";
 import os from "os";
+import cloudinary from "cloudinary";
+import { revalidatePath } from "next/cache";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 async function savePhotosToLocal(formData) {
   /*extracts all the files with the key "files" from the formData object. 
@@ -40,12 +48,27 @@ async function savePhotosToLocal(formData) {
   return await Promise.all(multipleBuffersPromise);
 }
 
+async function uploadPhotosToCloudinary(newFiles) {
+  const multiplePhotosPromise = newFiles.map((file) =>
+    cloudinary.v2.uploader.upload(file.filepath, { folder: "nextjs-upload" })
+  );
+  return await Promise.all(multiplePhotosPromise);
+}
+
 export async function uploadPhoto(formData) {
   try {
     //save photo files to temporary folder
     const newFiles = await savePhotosToLocal(formData);
 
-    console.log("newFiles", newFiles);
+    //upload to the cloud after saving the photo file to the temp folder
+    const photos = await uploadPhotosToCloudinary(newFiles);
+
+    //delete photo files in temp folder after successfull upload
+    //uses the Node.js fs module to delete a file specified by its file path (file.filepath).
+    newFiles.map((file) => fs.unlink(file.filepath));
+
+    revalidatePath("/");
+    return { msg: "Upload success !" };
   } catch (error) {
     return { errMsg: error.message };
   }
