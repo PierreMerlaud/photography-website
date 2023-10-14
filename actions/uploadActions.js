@@ -74,6 +74,20 @@ export async function uploadPhoto(formData) {
   }
 }
 
+export async function getAllPhotos() {
+  try {
+    const { resources } = await cloudinary.v2.search
+      .expression("folder:nextjs-upload/*")
+      .sort_by("created_at", "desc")
+      .max_results(500)
+      .execute();
+
+    return resources;
+  } catch (error) {
+    return { errMsg: error.message };
+  }
+}
+
 /* Buffer Object: In environments like Node.js, the Buffer object is used to represent raw binary data. 
 It is particularly useful for working with binary data, such as images, audio, and other types of files. 
 
