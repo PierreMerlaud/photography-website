@@ -3,6 +3,8 @@ inline with the "use server" directive at the top of the function, or in a separ
 "use server";
 import path from "path";
 import fs from "fs/promises";
+import { v4 as uuidv4 } from "uuid";
+import os from "os";
 
 async function savePhotosToLocal(formData) {
   /*extracts all the files with the key "files" from the formData object. 
@@ -15,19 +17,35 @@ async function savePhotosToLocal(formData) {
       //creates a Buffer object from the binary data contained in the data variable
       const buffer = Buffer.from(data);
 
+      //create a unique name
+      const name = uuidv4();
+
+      //the file type (here 'jpeg')
+      const ext = file.type.split("/")[1];
+
       //creates a file path for where the image file will be saved
-      const uploadDir = path.join(process.cwd(), "public", `/${file.name}`);
+      // const uploadDir = path.join(process.cwd(), "public", `/${name}.${ext}`); DOESN't WORK IN VERCEL
+
+      //tmpdir()	Returns the operating system's default directory for temporary files
+      const tempdir = os.tmpdir();
+      const uploadDir = path.join(tempdir, `/${name}.${ext}`); //works in Vercel
 
       //This line uses the Node.js fs.writeFile method to write data to a file specified by the uploadDir
       fs.writeFile(uploadDir, buffer);
+
+      return { filepath: uploadDir, filename: file.name };
     })
   );
+  //ensures that the function will not proceed until all image processing and saving tasks are finished.
+  return await Promise.all(multipleBuffersPromise);
 }
 
 export async function uploadPhoto(formData) {
   try {
     //save photo files to temporary folder
     const newFiles = await savePhotosToLocal(formData);
+
+    console.log("newFiles", newFiles);
   } catch (error) {
     return { errMsg: error.message };
   }
@@ -62,4 +80,15 @@ uploadDir: The first argument is the file path where you want to save the data.
 
 buffer: The second argument is the data you want to write to the file. In this case, it's the binary data of the 
 image stored in a Buffer object.
+
+"UUID" stands for "Universally Unique Identifier." It is a 128-bit identifier that is standardized 
+to be unique across both space and time. UUIDs are often used in databases, distributed systems, and various 
+applications where uniqueness is critical. One of the most common versions of UUID is Version 4, which is generated using 
+random or pseudo-random numbers.
+
+The Node.js os module is a built-in module in Node.js that provides a set of operating system-related utility functions 
+and information. It allows you to interact with and retrieve information about the operating system on which your Node.js 
+application is running.
+
+Promise.all() is a built-in method in JavaScript that takes an array of promises and returns a new promise.
 */
