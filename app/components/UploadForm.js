@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import PhotoCard from "./PhotoCard";
 import ButtonSubmit from "./ButtonSubmit";
-import { uploadPhoto } from "@/actions/uploadActions";
+import { revalidate, uploadPhoto } from "@/actions/uploadActions";
 
 const UploadForm = () => {
   const formRef = useRef();
@@ -46,6 +46,17 @@ const UploadForm = () => {
     });
 
     const res = await uploadPhoto(formData);
+    if (res?.msg) alert(`Success: ${res?.msg}`); // <==> await delay(2000)
+    if (res?.errMsg) alert(`Error: ${res?.errMsg}`);
+
+    //clears the files state after successful or unsuccessful file uploads to reset the selection.
+    setFiles([]);
+    //reset the form element and ensures that users can easily select new files for upload.
+    formRef.current.reset();
+
+    //wait about 2sec to update cloudinary dtb
+    //then revalidatPath => call getAllPhotos()
+    revalidate("/");
   }
 
   return (
@@ -64,7 +75,7 @@ const UploadForm = () => {
         </h5>
 
         {/* Preview images */}
-        <div>
+        <div className="uploadFormDiv">
           {files.map((file, index) => (
             <PhotoCard
               key={index}

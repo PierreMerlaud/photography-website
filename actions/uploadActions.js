@@ -55,6 +55,10 @@ async function uploadPhotosToCloudinary(newFiles) {
   return await Promise.all(multiplePhotosPromise);
 }
 
+const delay = (delayInms) => {
+  return new Promise((resolve) => setTimeout(resolve, delayInms));
+};
+
 export async function uploadPhoto(formData) {
   try {
     //save photo files to temporary folder
@@ -66,6 +70,10 @@ export async function uploadPhoto(formData) {
     //delete photo files in temp folder after successfull upload
     //uses the Node.js fs module to delete a file specified by its file path (file.filepath).
     newFiles.map((file) => fs.unlink(file.filepath));
+
+    //delay about 2sec to update cloudinary dtb
+    //then revalidatPath => call getAllPhotos()
+    await delay(2000);
 
     revalidatePath("/");
     return { msg: "Upload success !" };
@@ -86,6 +94,22 @@ export async function getAllPhotos() {
   } catch (error) {
     return { errMsg: error.message };
   }
+}
+
+export async function deletePhoto(public_id) {
+  try {
+    await cloudinary.v2.uploader.destroy(public_id);
+
+    revalidatePath("/");
+
+    return { msg: "Delete Success!" };
+  } catch (error) {
+    return { errMsg: error.message };
+  }
+}
+
+export async function revalidate(path) {
+  revalidatePath(path);
 }
 
 /* Buffer Object: In environments like Node.js, the Buffer object is used to represent raw binary data. 
