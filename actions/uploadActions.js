@@ -74,7 +74,7 @@ export async function uploadPhoto(formData) {
 
     //delay about 2sec to update cloudinary dtb
     //then revalidatPath => call getAllPhotos()
-    await delay(2000);
+    // await delay(2000);
 
     //save photo files to my mongodb => no delay needed
     const newPhotos = photos.map((photo) => {
@@ -95,12 +95,23 @@ export async function uploadPhoto(formData) {
 
 export async function getAllPhotos() {
   try {
-    const { resources } = await cloudinary.v2.search
-      .expression("folder:nextjs-upload/*")
-      .sort_by("created_at", "desc")
-      .max_results(500)
-      .execute();
+    // FROM CLOUDINARY
+    // const { resources } = await cloudinary.v2.search
+    //   .expression("folder:nextjs-upload/*")
+    //   .sort_by("created_at", "desc")
+    //   .max_results(500)
+    //   .execute();
 
+    //FROM MONGODB
+    const photos = await Photo.find().sort("-createdAt");
+
+    console.log("photos", photos);
+
+    const resources = photos.map((photo) => ({
+      ...photo._doc,
+      _id: photo._id.toString(),
+    }));
+    console.log("resources", resources);
     return resources;
   } catch (error) {
     return { errMsg: error.message };
