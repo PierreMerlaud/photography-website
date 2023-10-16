@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import os from "os";
 import cloudinary from "cloudinary";
 import { revalidatePath } from "next/cache";
+import Photo from "@/models/photoModel";
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -74,6 +75,16 @@ export async function uploadPhoto(formData) {
     //delay about 2sec to update cloudinary dtb
     //then revalidatPath => call getAllPhotos()
     await delay(2000);
+
+    //save photo files to my mongodb => no delay needed
+    const newPhotos = photos.map((photo) => {
+      const newPhoto = new Photo({
+        public_id: photo.public_id,
+        secure_url: photo.secure_url,
+      });
+      return newPhoto;
+    });
+    await Photo.insertMany(newPhotos);
 
     revalidatePath("/");
     return { msg: "Upload success !" };

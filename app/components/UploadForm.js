@@ -33,7 +33,7 @@ const UploadForm = () => {
   //handles the preparation of form data for uploading selected image files.
   async function handleUpload() {
     if (!files.length) return alert("No image files are selected.");
-    if (!files.length > 3) return alert("Upload up to 3 image files.");
+    // if (!files.length > 3) return alert("Upload up to 3 image files.");
 
     /*FormData is a built-in JavaScript object that allows you to construct a set of key/value pairs representing 
     form fields and their values, which can be easily sent as the body of a POST request. */
@@ -46,7 +46,7 @@ const UploadForm = () => {
     });
 
     const res = await uploadPhoto(formData);
-    if (res?.msg) alert(`Success: ${res?.msg}`); // <==> await delay(2000)
+    // if (res?.msg) alert(`Success: ${res?.msg}`); // <==> await delay(2000)
     if (res?.errMsg) alert(`Error: ${res?.errMsg}`);
 
     //clears the files state after successful or unsuccessful file uploads to reset the selection.
@@ -56,7 +56,7 @@ const UploadForm = () => {
 
     //wait about 2sec to update cloudinary dtb
     //then revalidatPath => call getAllPhotos()
-    revalidate("/");
+    // revalidate("/");
   }
 
   return (
