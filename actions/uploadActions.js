@@ -37,6 +37,7 @@ async function savePhotosToLocal(formData) {
 
       //tmpdir()	Returns the operating system's default directory for temporary files
       const tempdir = os.tmpdir();
+
       const uploadDir = path.join(tempdir, `/${name}.${ext}`); //works in Vercel
 
       //This line uses the Node.js fs.writeFile method to write data to a file specified by the uploadDir
@@ -53,6 +54,7 @@ async function uploadPhotosToCloudinary(newFiles) {
   const multiplePhotosPromise = newFiles.map((file) =>
     cloudinary.v2.uploader.upload(file.filepath, { folder: "nextjs-upload" })
   );
+  console.log("multpilePhotosPromise", multiplePhotosPromise);
   return await Promise.all(multiplePhotosPromise);
 }
 
@@ -64,9 +66,11 @@ export async function uploadPhoto(formData) {
   try {
     //save photo files to temporary folder
     const newFiles = await savePhotosToLocal(formData);
+    console.log("newFiles", newFiles);
 
     //upload to the cloud after saving the photo file to the temp folder
     const photos = await uploadPhotosToCloudinary(newFiles);
+    console.log("photosssss", photos);
 
     //delete photo files in temp folder after successfull upload
     //uses the Node.js fs module to delete a file specified by its file path (file.filepath).
@@ -74,7 +78,7 @@ export async function uploadPhoto(formData) {
 
     //delay about 2sec to update cloudinary dtb
     //then revalidatPath => call getAllPhotos()
-    // await delay(2000);
+    await delay(2000);
 
     //save photo files to my mongodb => no delay needed
     const newPhotos = photos.map((photo) => {
@@ -96,21 +100,21 @@ export async function uploadPhoto(formData) {
 export async function getAllPhotos() {
   try {
     // FROM CLOUDINARY
-    // const { resources } = await cloudinary.v2.search
-    //   .expression("folder:nextjs-upload/*")
-    //   .sort_by("created_at", "desc")
-    //   .max_results(500)
-    //   .execute();
+    const { resources } = await cloudinary.v2.search
+      .expression("folder:nextjs-upload/*")
+      .sort_by("created_at", "desc")
+      .max_results(500)
+      .execute();
 
     //FROM MONGODB
-    const photos = await Photo.find().sort("-createdAt");
+    // const photos = await Photo.find().sort("-createdAt");
 
-    console.log("photos", photos);
+    // console.log("photos", photos);
 
-    const resources = photos.map((photo) => ({
-      ...photo._doc,
-      _id: photo._id.toString(),
-    }));
+    // const resources = photos.map((photo) => ({
+    //   ...photo._doc,
+    //   _id: photo._id.toString(),
+    // }));
     console.log("resources", resources);
     return resources;
   } catch (error) {
@@ -120,7 +124,10 @@ export async function getAllPhotos() {
 
 export async function deletePhoto(public_id) {
   try {
-    await cloudinary.v2.uploader.destroy(public_id);
+    await Promise.all([
+      Photo.findOneAndDelete({ public_id }),
+      cloudinary.v2.uploader.destroy(public_id),
+    ]);
 
     revalidatePath("/");
 
@@ -174,4 +181,14 @@ and information. It allows you to interact with and retrieve information about t
 application is running.
 
 Promise.all() is a built-in method in JavaScript that takes an array of promises and returns a new promise.
+
+{...photo._doc,_id: photo._id.toString()}: This is object destructuring and the spread syntax (...). It's used to create a 
+shallow copy of the photo._doc object, which likely contains properties of the photo object.
+...photo._doc takes all the properties of the photo._doc object and includes them in the new object.
+_id: photo._id.toString(): This is adding a new property to the new object. It sets the _id property to the result of calling 
+the toString() method on photo._id.
+In the context of MongoDB and Mongoose (a popular MongoDB object modeling library for Node.js), the _doc property is used to 
+access the raw data of a document retrieved from the database.
+
+
 */

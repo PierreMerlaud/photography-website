@@ -8,18 +8,14 @@ const PhotoList = ({ photos }) => {
   }
   return (
     <div className="photoListDiv">
-      {Array.isArray(photos) ? (
-        photos.map((photo) => (
-          <PhotoCard
-            key={photo?.public_id}
-            url={photo?.secure_url}
-            onClick={() => handleDeletePhoto(photo?.public_id)}
-          />
-        ))
-      ) : (
-        // Handle the case when photos is not an array, e.g., display a message or an empty state.
-        <p>No photos available</p>
-      )}
+      {photos.map((photo) => (
+        <PhotoCard
+          //uses the optional chaining operator (?.) to handle cases where the public_id property may not exist, preventing potential errors.
+          key={photo?.public_id}
+          url={photo?.secure_url}
+          onClick={() => handleDeletePhoto(photo?.public_id)}
+        />
+      ))}
     </div>
   );
 };
