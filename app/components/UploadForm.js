@@ -8,6 +8,12 @@ import { revalidate, uploadPhoto } from "@/actions/uploadActions";
 const UploadForm = () => {
   const formRef = useRef();
   const [files, setFiles] = useState([]);
+  const [title, setTitle] = useState(""); // Define the title state
+  const [analog, setAnalog] = useState("");
+  const [camera, setCamera] = useState("");
+  const [film, setFilm] = useState("");
+  const [color, setColor] = useState("");
+  const [description, setDescription] = useState(""); // Define the description state
 
   async function handleInputFiles(e) {
     const files = e.target.files;
@@ -34,30 +40,26 @@ const UploadForm = () => {
   //handles the preparation of form data for uploading selected image files.
   async function handleUpload() {
     if (!files.length) return alert("No image files are selected.");
-    if (!files.length > 3) return alert("Upload up to 3 image files.");
+    if (files.length > 3) return alert("Upload up to 3 image files.");
 
-    /*FormData is a built-in JavaScript object that allows you to construct a set of key/value pairs representing 
-    form fields and their values, which can be easily sent as the body of a POST request. */
     const formData = new FormData();
+    formData.append("title", title); // Add title to the formData
+    formData.append("analog", analog);
+    formData.append("camera", camera);
+    formData.append("film", film);
+    formData.append("color", color);
+    formData.append("description", description); // Add description to the formData
 
-    /*This loop iterates over each file in the files array and appends it to the formData object using the append method. 
-    The key "files" and the file itself are paired in the formData object. */
     files.forEach((file) => {
       formData.append("files", file);
     });
-    // console.log("formData", formData);
 
     const res = await uploadPhoto(formData);
-    if (res?.msg) alert(`Success: ${res?.msg}`); // <==> await delay(2000)
+    if (res?.msg) alert(`Success: ${res?.msg}`);
     if (res?.errMsg) alert(`Error: ${res?.errMsg}`);
 
-    //clears the files state after successful or unsuccessful file uploads to reset the selection.
     setFiles([]);
-    //reset the form element and ensures that users can easily select new files for upload.
     formRef.current.reset();
-
-    //wait about 2sec to update cloudinary dtb
-    //then revalidatPath => call getAllPhotos()
     revalidate("/");
   }
 
@@ -71,6 +73,44 @@ const UploadForm = () => {
           multiple
           onChange={handleInputFiles}
         />
+        <div>
+          <input
+            type="text"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Analog ?"
+            value={analog}
+            onChange={(e) => setAnalog(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Camera"
+            value={camera}
+            onChange={(e) => setCamera(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Film"
+            value={film}
+            onChange={(e) => setFilm(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Color ?"
+            value={color}
+            onChange={(e) => setColor(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
         <h5>
           (*) Only accept image files less than 1mb in size. Up to 3 photo
           files.
