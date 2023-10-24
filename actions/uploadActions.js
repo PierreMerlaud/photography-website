@@ -54,7 +54,7 @@ async function uploadPhotosToCloudinary(newFiles) {
   const multiplePhotosPromise = newFiles.map((file) =>
     cloudinary.v2.uploader.upload(file.filepath, { folder: "nextjs-upload" })
   );
-  console.log("multpilePhotosPromise", multiplePhotosPromise);
+
   return await Promise.all(multiplePhotosPromise);
 }
 
@@ -66,7 +66,7 @@ export async function uploadPhoto(formData) {
   try {
     //save photo files to temporary folder
     const newFiles = await savePhotosToLocal(formData);
-    console.log("newFiles", newFiles);
+    // console.log("newFiles", newFiles);
 
     //upload to the cloud after saving the photo file to the temp folder
     const photos = await uploadPhotosToCloudinary(newFiles);
@@ -85,9 +85,17 @@ export async function uploadPhoto(formData) {
       const newPhoto = new Photo({
         public_id: photo.public_id,
         secure_url: photo.secure_url,
+        title: formData.get("title"), // Get title from form data
+        analog: formData.get("analog"),
+        camera: formData.get("camera"),
+        film: formData.get("film"),
+        color: formData.get("color"),
+        description: formData.get("description"), // Get description from form data
       });
+
       return newPhoto;
     });
+    console.log("newPhotosssss", newPhotos);
     await Photo.insertMany(newPhotos);
 
     revalidatePath("/");
@@ -100,21 +108,21 @@ export async function uploadPhoto(formData) {
 export async function getAllPhotos() {
   try {
     // FROM CLOUDINARY
-    const { resources } = await cloudinary.v2.search
-      .expression("folder:nextjs-upload/*")
-      .sort_by("created_at", "desc")
-      .max_results(500)
-      .execute();
+    // const { resources } = await cloudinary.v2.search
+    //   .expression("folder:nextjs-upload/*")
+    //   .sort_by("created_at", "desc")
+    //   .max_results(500)
+    //   .execute();
 
     //FROM MONGODB
-    // const photos = await Photo.find().sort("-createdAt");
+    const photos = await Photo.find().sort("-createdAt").limit(2);
 
     // console.log("photos", photos);
 
-    // const resources = photos.map((photo) => ({
-    //   ...photo._doc,
-    //   _id: photo._id.toString(),
-    // }));
+    const resources = photos.map((photo) => ({
+      ...photo._doc,
+      _id: photo._id.toString(),
+    }));
     console.log("resources", resources);
     return resources;
   } catch (error) {
