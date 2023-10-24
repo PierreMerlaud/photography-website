@@ -53,6 +53,7 @@ const UploadForm = () => {
     files.forEach((file) => {
       formData.append("files", file);
     });
+    console.log("formData", formData);
 
     const res = await uploadPhoto(formData);
     if (res?.msg) alert(`Success: ${res?.msg}`);
