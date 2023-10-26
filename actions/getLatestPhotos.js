@@ -8,6 +8,7 @@ export async function getLatestPhotos() {
       ...photo._doc,
       _id: photo._id.toString(),
     }));
+
     return resources;
   } catch (error) {
     return { errMsg: error.message };
