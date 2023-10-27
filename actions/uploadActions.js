@@ -70,7 +70,7 @@ export async function uploadPhoto(formData) {
 
     //upload to the cloud after saving the photo file to the temp folder
     const photos = await uploadPhotosToCloudinary(newFiles);
-    console.log("photosssss", photos);
+    // console.log("photosssss", photos);
 
     //delete photo files in temp folder after successfull upload
     //uses the Node.js fs module to delete a file specified by its file path (file.filepath).
@@ -95,7 +95,7 @@ export async function uploadPhoto(formData) {
 
       return newPhoto;
     });
-    console.log("newPhotosssss", newPhotos);
+    // console.log("newPhotosssss", newPhotos);
     await Photo.insertMany(newPhotos);
 
     revalidatePath("/");
@@ -115,7 +115,8 @@ export async function getAllPhotos() {
     //   .execute();
 
     //FROM MONGODB
-    const photos = await Photo.find().sort("-createdAt").limit(2);
+    const photos = await Photo.find().sort("-createdAt");
+    // .limit(2);
 
     // console.log("photos", photos);
 

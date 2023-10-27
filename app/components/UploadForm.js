@@ -19,7 +19,7 @@ const UploadForm = () => {
     const files = e.target.files;
 
     const newFiles = [...files].filter((file) => {
-      if (file.size < 1024 * 1024 && file.type.startsWith("image/")) {
+      if (file.size < 4000 * 4000 && file.type.startsWith("image/")) {
         //only accept image files less than 1mb in size.
         return file;
       }
