@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import PhotoList from "@/app/components/PhotoList";
+import PhotoListPublic from "@/app/components/PhotoListPublic";
 import { getAllPhotos } from "@/actions/uploadActions";
+import Link from "next/link";
 
 const Gallery = () => {
   const [photos, setPhotos] = useState([]);
-  const [sorting, setSorting] = useState("none"); // Default to no sorting
+  const [colorSorting, setColorSorting] = useState("none"); // Default to no color sorting
+  const [supportSorting, setSupportSorting] = useState("none"); // Default to no sorting by support
 
   // Function to fetch photos and set the state
   const fetchPhotos = async () => {
@@ -19,37 +21,71 @@ const Gallery = () => {
     fetchPhotos();
   }, []);
 
-  // Function to handle sorting
-  const handleSort = (choice) => {
-    setSorting(choice);
+  // Function to handle sorting by color
+  const handleColorSort = (choice) => {
+    setColorSorting(choice);
   };
 
-  // Filter and sort the photos based on the sorting choice
+  // Function to handle sorting by support
+  const handleSupportSort = (choice) => {
+    setSupportSorting(choice);
+  };
+
+  // Function to reset the filters and show all photos
+  const handleReset = () => {
+    setColorSorting("none");
+    setSupportSorting("none");
+  };
+
+  // Modify the filteredPhotos array to include both color and support filtering
   const filteredPhotos = photos.filter((photo) => {
-    if (sorting === "color") {
-      return photo.color === true; // Filter by color photos
-    } else if (sorting === "nb") {
-      return photo.color === false; // Filter by black & white photos
-    }
-    return true; // No filtering
+    const colorFiltered =
+      colorSorting === "color"
+        ? photo.color === true
+        : colorSorting === "nb"
+        ? photo.color === false
+        : true;
+
+    const supportFiltered =
+      supportSorting === "analog"
+        ? photo.analog === true
+        : supportSorting === "digital"
+        ? photo.analog === false
+        : true;
+
+    return colorFiltered && supportFiltered;
   });
 
   return (
     <div>
       <h1>Gallery</h1>
       <div>
-        <label htmlFor="sorting">Filter by color:</label>
+        <label htmlFor="colorSorting">Filter by Color:</label>
         <select
-          id="sorting"
-          value={sorting}
-          onChange={(e) => handleSort(e.target.value)}
+          id="colorSorting"
+          value={colorSorting}
+          onChange={(e) => handleColorSort(e.target.value)}
         >
           <option value="none">None</option>
           <option value="color">Color</option>
           <option value="nb">Black & White</option>
         </select>
       </div>
-      <PhotoList photos={filteredPhotos} />
+      <div>
+        <label htmlFor="supportSorting">Filter by Support:</label>
+        <select
+          id="supportSorting"
+          value={supportSorting}
+          onChange={(e) => handleSupportSort(e.target.value)}
+        >
+          <option value="none">None</option>
+          <option value="analog">Analog</option>
+          <option value="digital">Digital</option>
+        </select>
+      </div>
+      <button onClick={handleReset}>Reset Filters</button>
+      <PhotoListPublic photos={filteredPhotos} />
+      <Link href="/">Home</Link>
     </div>
   );
 };
