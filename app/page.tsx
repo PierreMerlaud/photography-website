@@ -11,6 +11,7 @@ const Home = async () => {
       <h1>Latest photos.</h1>
       <PhotoList photos={photos || []} />
       <Link href="/pages/gallery">gallery</Link>
+      <Link href="/pages/addNewPhotos">add new photos</Link>
     </div>
   );
 };
