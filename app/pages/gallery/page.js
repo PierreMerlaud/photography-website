@@ -22,21 +22,6 @@ const Gallery = () => {
     fetchPhotos();
   }, []);
 
-  // Function to handle sorting by color
-  const handleColorSort = (choice) => {
-    setColorSorting(choice);
-  };
-
-  // Function to handle sorting by support
-  const handleSupportSort = (choice) => {
-    setSupportSorting(choice);
-  };
-
-  // Function to handle sorting by camera model
-  const handleCameraSort = (choice) => {
-    setCameraSorting(choice);
-  };
-
   // Function to reset the filters and show all photos
   const handleReset = () => {
     setColorSorting("none");
@@ -44,7 +29,7 @@ const Gallery = () => {
     setCameraSorting("none");
   };
 
-  // Modify the filteredPhotos array to include both color and support filtering
+  // Modify the filteredPhotos array to include both filterings
   const filteredPhotos = photos.filter((photo) => {
     const colorFiltered =
       colorSorting === "color"
@@ -85,37 +70,38 @@ const Gallery = () => {
     <div>
       <h1>Gallery</h1>
       <div>
-        <label htmlFor="colorSorting">Filter by Color:</label>
+        <h3>Filtres</h3>
+        <label htmlFor="colorSorting">Couleur / Noir et blanc:</label>
         <select
           id="colorSorting"
           value={colorSorting}
-          onChange={(e) => handleColorSort(e.target.value)}
+          onChange={(e) => setColorSorting(e.target.value)}
         >
-          <option value="none">None</option>
+          <option value="none">Toutes les photos</option>
           <option value="color">Color</option>
           <option value="nb">Black & White</option>
         </select>
       </div>
       <div>
-        <label htmlFor="supportSorting">Filter by Support:</label>
+        <label htmlFor="supportSorting">Argentique / Numérique</label>
         <select
           id="supportSorting"
           value={supportSorting}
-          onChange={(e) => handleSupportSort(e.target.value)}
+          onChange={(e) => setSupportSorting(e.target.value)}
         >
-          <option value="none">None</option>
-          <option value="analog">Analog</option>
-          <option value="digital">Digital</option>
+          <option value="none">Toutes les photos</option>
+          <option value="analog">Argentique</option>
+          <option value="digital">Numérique</option>
         </select>
       </div>
       <div>
-        <label htmlFor="cameraSorting">Filter by Camera Model:</label>
+        <label htmlFor="cameraSorting">Appareils</label>
         <select
           id="cameraSorting"
           value={cameraSorting}
-          onChange={(e) => handleCameraSort(e.target.value)}
+          onChange={(e) => setCameraSorting(e.target.value)}
         >
-          <option value="none">None</option>
+          <option value="none">Tous les appareils</option>
           {allCameras.map((cameraModel, index) => (
             <option key={index} value={cameraModel}>
               {cameraModel}
@@ -123,7 +109,7 @@ const Gallery = () => {
           ))}
         </select>
       </div>
-      <button onClick={handleReset}>Reset Filters</button>
+      <button onClick={handleReset}>Réinitialiser tous les filtres</button>
       <PhotoListPublic photos={filteredPhotos} />
       <Link href="/">Home</Link>
     </div>
