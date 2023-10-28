@@ -52,7 +52,26 @@ async function savePhotosToLocal(formData) {
 
 async function uploadPhotosToCloudinary(newFiles) {
   const multiplePhotosPromise = newFiles.map((file) =>
-    cloudinary.v2.uploader.upload(file.filepath, { folder: "nextjs-upload" })
+    cloudinary.v2.uploader.upload(file.filepath, {
+      folder: "nextjs-upload",
+      transformation: [
+        { width: 1500, crop: "fill" },
+        {
+          color: "white",
+          overlay: {
+            font_family: "Arial",
+
+            font_size: 20,
+            text: "©PM",
+          },
+        },
+        { flags: "layer_apply", gravity: "south_east", x: 20, y: 20 },
+      ],
+      copyright: {
+        author: "Pierre Merlaud",
+        usage_rights: "Editorial use only",
+      },
+    })
   );
 
   return await Promise.all(multiplePhotosPromise);
