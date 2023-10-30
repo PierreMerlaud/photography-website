@@ -1,4 +1,5 @@
-import "./globals.css";
+import "./styles/globals.css";
+import "./styles/gallery.css";
 import { Inter } from "next/font/google";
 import connectDB from "@/utils/database";
 import Navbar from "./components/Navbar";
