@@ -1,11 +1,11 @@
 import React from "react";
 import UploadForm from "@/app/components/UploadForm";
-import { getAllPhotos } from "@/actions/uploadActions";
+import { getLatestPhotos } from "@/actions/getLatestPhotos";
 import PhotoList from "@/app/components/PhotoList";
 import Link from "next/link";
 
 const Home = async () => {
-  const photos = await getAllPhotos();
+  const photos = await getLatestPhotos();
 
   return (
     <div>

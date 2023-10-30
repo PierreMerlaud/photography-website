@@ -135,7 +135,6 @@ export async function getAllPhotos() {
 
     //FROM MONGODB
     const photos = await Photo.find().sort("-createdAt");
-    // .limit(2);
 
     // console.log("photos", photos);
 
